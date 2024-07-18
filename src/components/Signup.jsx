@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { FcGoogle } from 'react-icons/fc';
 import axios from 'axios';
 import bcrypt from 'bcryptjs';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
@@ -7,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -14,6 +14,8 @@ const Signup = () => {
     agreeTerms: false,
   });
   const [showPopup, setShowPopup] = useState(false);
+  const navigate = useNavigate();
+  const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,7 +29,6 @@ const Signup = () => {
     e.preventDefault();
     try {
       if (!formData.agreeTerms) {
-        // If terms and conditions are not agreed upon
         alert('Please agree to the Terms of Service and Privacy Policy.');
         return;
       }
@@ -47,7 +48,7 @@ const Signup = () => {
     setShowPopup(false); // Function to close the popup
   };
 
-  const handleGoogleSignup = async () => {
+  const handleGoogleSignup = async (response) => {
     try {
       const result = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/google-login`, {
         tokenId: response.credential,
@@ -59,14 +60,12 @@ const Signup = () => {
       console.error('Google login failed:', error);
       setErrorMessage('Google login failed');
     }
-    // Implement Google OAuth signup logic here
-    // Redirect to Google OAuth URL or handle using libraries like Google's signIn method
   };
+
   const handleGoogleFailure = (error) => {
     console.error('Google login failed:', error);
     setErrorMessage('Google login failed');
   };
-
   return (
     <GoogleOAuthProvider clientId={clientId}>
 
